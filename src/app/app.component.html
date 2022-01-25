@@ -1,13 +1,21 @@
 <!DOCTYPE html>
 <div>Dash Board</div>
-<button (click)="getStatus()">get Status</button>
-<button (click)="getCUR('https://api.publicapis.org/entries')">Click here</button>
-<div>{{status}}</div>
-<div>{{query}}</div>
+<div><button (click)="getStatus()">get Status</button></div>
 <div *ngIf="status">
-    <div *ngFor="let el of states">
-        <button (click)="getUrl(el.name)">{{el.name}}</button>
-        <div>{{el.value |async}}</div>
-    </div>
+    <table>
+        <tr>
+            <th>Country</th>
+            <th>Rate</th>
+        </tr>
+        <tr *ngFor="let el of states">
+            <td>
+                <div>{{el.name}}</div>
+            </td>
+            <td>
+                <div>{{el.value}}</div>
+            </td>
+            <td></td>
+        </tr>
+    </table>
+    <div>{{ curTable | async }}</div>
 </div>
-<div>{{url}}</div>

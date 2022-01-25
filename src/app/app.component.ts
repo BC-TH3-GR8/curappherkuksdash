@@ -1,74 +1,83 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { lastValueFrom, map, observable, Observable, Observer } from 'rxjs';
-
+import { lastValueFrom, observable, Observable, Observer, of, share, Subscription } from 'rxjs';
+import { map } from 'rxjs';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
+export class AppComponent{
   public json = {
     currList: [
       'INR/USD',
-      'INR/EURO',
+      'INR/EUR',
       'INR/SGD',
       'INR/AUD',
       'INR/GBP'
     ],
   };
+  public name="";
   public states:any = [];
   public status = false;
   public apiKey = 'fb699f9c5a43d5d4a7f2';
   public query = '';
   public url ='';
-  public val =  new Observable<string>((observer: Observer<string>) => {
-    //setInterval(() => observer.next(new Date().toString()), 1000);
-  });
+  public curTable: any;
+  public myDate :any;
+  public i=0;
 
   constructor(private http: HttpClient){
-
+    // setInterval(() => {
+    //   this.getStatus(true);
+    // }, 1000);
+    // //this.getAsyncData();
   }
 
-  public getStatus(): void {
-    if(!this.status){
+  getAsyncData() {
+    // Fake Slow Async Data
+    const value$ =  this.http.get('https://www.boredapi.com/api/activity');
+   return value$;
+ }
+
+  ngOnInit() {
+  }
+
+  public getStatus(refresh = false): void {
+    if(!this.status && !refresh){
       this.processJson();
     } else {
       this.url = '';
     }
-    this.status = !this.status;
+    if(!refresh){
+      this.status = !this.status;
+    }
   }
 
   public processJson() {
     this.states=[];
     this.json.currList.forEach(_=>{
+      const name = _.split("/")[1];
       this.states.push({
-        name:_.split("/")[1],
-        value: new Observable<string>()
+        name: name,
+        value: this.getUrl(name)
       });
+      // this.states.push({
+      //   name: name,
+      //   value: this.i++
+      // });
     });
   }
 
-  // public getCUR(): void {
-  //   //this.query = this.getQuery(this.usd());
-  // }
-
   public async getCUR(url: string, options?: any) {
-    //this.states.find((_: any)=>_===options);
-    // this.http.get(url).pipe(map(data => {
-    //   this.val = data;
-    //   console.log(data);
-    // }))
     const value$ =  this.http.get(url);
     return await lastValueFrom(value$);
   }
 
   public async getUrl(key:string):Promise<void>{
-  // this.url='https://free.currconv.com/api/v7/convert?q=' + this.getQuery(key) +  '&compact=ultra&apiKey=' +  this.apiKey;
-  this.url='https://api.publicapis.org/entries';
+  this.url='https://free.currconv.com/api/v7/convert?q=' + this.getQuery(key) +  '&compact=ultra&apiKey=' +  this.apiKey;
     await this.getCUR(this.url,key).then((v)=>{
-      this.states.find((_: any)=>_===key).value.next(v);
-      debugger;
+      this.states.find((_: any)=>_.name===key).value =  Object.values(v)[0];
     }
     );
   }
