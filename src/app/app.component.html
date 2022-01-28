@@ -1,20 +1,23 @@
 <!DOCTYPE html>
-<div>Dash Board</div>
-<div><button (click)="getStatus()">get Status</button></div>
-<div *ngIf="status">
-    <table>
-        <tr>
-            <th>Country</th>
-            <th>Rate</th>
+<div class="header-wrapper">
+    <div class="header">Dash Board</div>
+    <div class="button"><button (click)="toggleTable()">{{status?'show':'hide'}} table</button></div>
+</div>
+<div class="table-wrapper" *ngIf="!status">
+    <table class="table">
+        <tr class="table-header">
+            <th class="h1">Country</th>
+            <th class="h2">Rate</th>
+            <th class="h3">Refresh rate</th>
         </tr>
-        <tr *ngFor="let el of states">
-            <td>
+        <tr class="table-row" *ngFor="let el of states">
+            <td class="c1">
                 <div>{{el.name}}</div>
             </td>
-            <td>
-                <div>{{el.value |async}}</div>
+            <td class="c2">
+                <div ngClass="error : apiError">{{el.value |async}}</div>
             </td>
-            <td></td>
+            <td class="c3"><button (click)="getUrl(el.name)">Refresh</button></td>
         </tr>
     </table>
 </div>

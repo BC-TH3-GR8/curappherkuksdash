@@ -20,7 +20,7 @@ export class AppComponent {
   public json = {
     currList: ['INR/USD', 'INR/EUR', 'INR/SGD', 'INR/AUD', 'INR/GBP'],
   };
-  public name = '';
+  public apiError = false;
   public states: any = [];
   public status = false;
   public apiKey = 'fb699f9c5a43d5d4a7f2';
@@ -32,15 +32,15 @@ export class AppComponent {
 
   constructor(private http: HttpClient) {}
 
-  public getStatus(refresh = false): void {
-    if (!this.status && !refresh) {
-      this.processJson();
-    } else {
-      this.url = '';
-    }
-    if (!refresh) {
+  ngOnInit(): void {
+    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
+    //Add 'implements OnInit' to the class.
+    this.processJson();
+  }
+
+  public toggleTable(): void {
       this.status = !this.status;
-    }
+
   }
 
   public processJson() {
@@ -61,11 +61,18 @@ export class AppComponent {
 
   public async getUrl(key: string): Promise<void> {
     this.url = 'https://free.currconv.com/api/v7/convert?q=' + this.getQuery(key) + '&compact=ultra&apiKey=' +  this.apiKey;
-    await this.getCUR(this.url, key).then((v: any) => {
-      this.states
-        .find((_: any) => _.name === key)
-        .value.next(Object.keys(v).map((index: any) => v[index]));
-    });
+    try{
+      await this.getCUR(this.url, key).then((v: any) => {
+        this.states
+          .find((_: any) => _.name === key)
+          .value.next(Object.keys(v).map((index: any) => v[index]));
+        this.apiError = false;
+      });
+    }catch{
+      this.apiError = true;
+      console.log('error');
+      alert('api limit reached');
+    }
   }
 
   public getQuery(key: string): string {
