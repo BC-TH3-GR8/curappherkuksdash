@@ -15,7 +15,7 @@
                 <div>{{el.name}}</div>
             </td>
             <td class="c2">
-                <div ngClass="error : apiError">{{el.value |async}}</div>
+                <div>{{el.value |async}}</div>
             </td>
             <td class="c3"><button (click)="getUrl(el.name)">Refresh</button></td>
         </tr>
